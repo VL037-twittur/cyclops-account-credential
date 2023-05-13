@@ -1,7 +1,6 @@
 package vincentlow.twittur.account.credential.web.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,7 +31,6 @@ public class AuthenticationController extends BaseController {
 
     try {
       AuthenticationResponse response = authenticationService.register(request);
-      new ResponseEntity<>(response, HttpStatus.OK);
       return toSuccessResponseEntity(toApiSingleResponse(response));
     } catch (RuntimeException e) {
       log.error("#AuthenticationController#register ERROR! with request: {}, and error: {}", request, e.getMessage(),
