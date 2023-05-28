@@ -47,6 +47,22 @@ public class AccountCredentialController extends BaseController {
     }
   }
 
+  @GetMapping("/{id}")
+  public ResponseEntity<ApiSingleResponse<AccountCredentialResponse>> getAccountCredentialById(
+      @PathVariable String id) {
+
+    try {
+      AccountCredential account = accountCredentialService.getAccountCredentialById(id);
+      AccountCredentialResponse response = toResponse(account, AccountCredentialResponse.class);
+
+      return toSuccessResponseEntity(toApiSingleResponse(response));
+    } catch (RuntimeException e) {
+      log.error("#AccountCredentialController#getAccountCredentialById ERROR! with id: {}, and error: {}", id,
+          e.getMessage(), e);
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+
   @PutMapping("/{id}/username")
   public ResponseEntity<ApiResponse> updateAccountUsername(
       @PathVariable("id") String id, @RequestBody UpdateAccountUsernameRequest request) {

@@ -10,6 +10,8 @@ public interface AccountCredentialService {
 
   AccountCredential getAccountCredentialByUsername(String username);
 
+  AccountCredential getAccountCredentialById(String id);
+
   void updateAccountUsernameById(String id, UpdateAccountUsernameRequest request);
 
   void updateAccountEmailAddressById(String id, UpdateAccountEmailRequest request);
@@ -17,5 +19,4 @@ public interface AccountCredentialService {
   void updateAccountPhoneNumberById(String id, UpdateAccountPhoneNumberRequest request);
 
   void updateAccountPasswordById(String id, UpdateAccountPasswordRequest request);
-
 }
