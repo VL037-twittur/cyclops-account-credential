@@ -49,6 +49,14 @@ public class AccountCredentialServiceImpl implements AccountCredentialService {
   }
 
   @Override
+  public AccountCredential getAccountCredentialByEmailAddress(String emailAddress) {
+
+    AccountCredential accountCredential =
+        accountCredentialRepository.findByEmailAddressAndMarkForDeleteFalse(emailAddress);
+    return validateAccount(accountCredential, ExceptionMessage.ACCOUNT_NOT_FOUND);
+  }
+
+  @Override
   // @Transactional
   public void updateAccountUsernameById(String id, UpdateAccountUsernameRequest request) {
 

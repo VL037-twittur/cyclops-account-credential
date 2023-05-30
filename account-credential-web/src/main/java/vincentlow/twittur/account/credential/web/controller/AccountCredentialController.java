@@ -4,12 +4,7 @@ import static vincentlow.twittur.account.credential.util.ObjectMappingHelper.toR
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import lombok.extern.slf4j.Slf4j;
 import vincentlow.twittur.account.credential.model.constant.ApiPath;
@@ -59,6 +54,23 @@ public class AccountCredentialController extends BaseController {
     } catch (RuntimeException e) {
       log.error("#AccountCredentialController#getAccountCredentialById ERROR! with id: {}, and error: {}", id,
           e.getMessage(), e);
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+
+  @GetMapping("/email/{emailAddress}")
+  public ResponseEntity<ApiSingleResponse<AccountCredentialResponse>> getAccountCredentialByEmailAddress(
+      @PathVariable String emailAddress) {
+
+    try {
+      AccountCredential account = accountCredentialService.getAccountCredentialByEmailAddress(emailAddress);
+      AccountCredentialResponse response = toResponse(account, AccountCredentialResponse.class);
+
+      return toSuccessResponseEntity(toApiSingleResponse(response));
+    } catch (RuntimeException e) {
+      log.error(
+          "#AccountCredentialController#getAccountCredentialByEmailAddress ERROR! with emailAddress: {}, and error: {}",
+          emailAddress, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }
