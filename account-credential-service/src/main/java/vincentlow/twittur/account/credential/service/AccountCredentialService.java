@@ -12,6 +12,8 @@ public interface AccountCredentialService {
 
   AccountCredential getAccountCredentialById(String id);
 
+  AccountCredential getAccountCredentialByEmailAddress(String emailAddress);
+
   void updateAccountUsernameById(String id, UpdateAccountUsernameRequest request);
 
   void updateAccountEmailAddressById(String id, UpdateAccountEmailRequest request);
