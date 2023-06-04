@@ -1,6 +1,7 @@
 package vincentlow.twittur.account.credential.web.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +20,7 @@ import vincentlow.twittur.base.web.model.response.api.ApiSingleResponse;
 
 @Slf4j
 @RestController
-@RequestMapping(ApiPath.AUTHENTICATION)
+@RequestMapping(value = ApiPath.AUTHENTICATION, produces = MediaType.APPLICATION_JSON_VALUE)
 public class AuthenticationController extends BaseController {
 
   @Autowired
