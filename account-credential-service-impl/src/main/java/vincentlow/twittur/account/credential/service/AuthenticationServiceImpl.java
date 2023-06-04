@@ -23,7 +23,10 @@ import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import vincentlow.twittur.account.credential.client.AccountProfileFeignClient;
+import vincentlow.twittur.account.credential.client.InformationFeignClient;
 import vincentlow.twittur.account.credential.client.model.request.CreateAccountProfileRequest;
+import vincentlow.twittur.account.credential.client.model.request.EmailRequest;
+import vincentlow.twittur.account.credential.model.constant.EmailTemplateCode;
 import vincentlow.twittur.account.credential.model.constant.ErrorCode;
 import vincentlow.twittur.account.credential.model.constant.ExceptionMessage;
 import vincentlow.twittur.account.credential.model.constant.Role;
@@ -60,6 +63,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
   @Autowired
   private AuthenticationManager authenticationManager;
+
+  @Autowired
+  private InformationFeignClient informationFeignClient;
 
   // @Autowired
   // private AccountProfileFeignClientService accountProfileFeignClientService;
@@ -113,6 +119,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     String refreshToken = jwtService.generateRefreshToken(accountCredential);
 
     saveAccountToken(accountCredential, accessToken, now);
+
+    EmailRequest emailRequest = EmailRequest.builder()
+        .recipient(accountCredential.getEmailAddress())
+        .templateCode(EmailTemplateCode.AFTER_REGISTRATION)
+        .username(request.getUsername())
+        .build();
+
+    informationFeignClient.sendEmail(emailRequest);
 
     return AuthenticationResponse.builder()
         .accessToken(accessToken)
