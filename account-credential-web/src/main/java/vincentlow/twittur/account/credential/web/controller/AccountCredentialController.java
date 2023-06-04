@@ -3,8 +3,14 @@ package vincentlow.twittur.account.credential.web.controller;
 import static vincentlow.twittur.account.credential.util.ObjectMappingHelper.toResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
 import vincentlow.twittur.account.credential.model.constant.ApiPath;
@@ -21,7 +27,7 @@ import vincentlow.twittur.base.web.model.response.api.ApiSingleResponse;
 
 @Slf4j
 @RestController
-@RequestMapping(ApiPath.ACCOUNT_CREDENTIAL)
+@RequestMapping(value = ApiPath.ACCOUNT_CREDENTIAL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class AccountCredentialController extends BaseController {
 
   @Autowired
