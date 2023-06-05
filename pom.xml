@@ -125,6 +125,7 @@
             </plugins>
         </pluginManagement>
     </build>
+
     <repositories>
         <repository>
             <id>netflix-candidates</id>
