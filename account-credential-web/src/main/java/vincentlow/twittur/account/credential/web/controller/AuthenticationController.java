@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -61,6 +62,20 @@ public class AuthenticationController extends BaseController {
     } catch (RuntimeException e) {
       log.error("#AuthenticationController#refreshToken ERROR! with request: {}, and error: {}", request,
           e.getMessage(), e);
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+
+  @PostMapping("/validate-token")
+  public ResponseEntity<ApiSingleResponse<Boolean>> validateToken(HttpServletRequest request,
+      @RequestParam String token) {
+
+    try {
+      boolean response = authenticationService.validateToken(request, token);
+      return toSuccessResponseEntity(toApiSingleResponse(response));
+    } catch (RuntimeException e) {
+      log.error("#AuthenticationController#validateToken ERROR! with request: {}, token: {}, and error: {}", request,
+          token, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }

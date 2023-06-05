@@ -12,4 +12,6 @@ public interface AuthenticationService {
   AuthenticationResponse login(LoginRequest request);
 
   AuthenticationResponse refreshToken(HttpServletRequest request);
+
+  boolean validateToken(HttpServletRequest request, String token);
 }

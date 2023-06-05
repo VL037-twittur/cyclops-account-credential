@@ -16,8 +16,6 @@ import vincentlow.twittur.account.credential.repository.TokenRepository;
 @Service
 public class LogoutServiceImpl implements LogoutHandler {
 
-  private final String STARTS_WITH_BEARER = "Bearer "; // including space
-
   @Autowired
   private TokenRepository tokenRepository;
 
@@ -25,9 +23,9 @@ public class LogoutServiceImpl implements LogoutHandler {
   public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
 
     String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-    if (Objects.nonNull(authHeader) && authHeader.startsWith(STARTS_WITH_BEARER)) {
-      String jwtToken = authHeader.substring(STARTS_WITH_BEARER.length());
-      Token token = tokenRepository.findByToken(jwtToken);
+    if (Objects.nonNull(authHeader) && authHeader.startsWith(JWTServiceImpl.TOKEN_PREFIX)) {
+      String jwtToken = authHeader.substring(JWTServiceImpl.TOKEN_PREFIX.length());
+      Token token = tokenRepository.findByTokenAndExpiredFalseAndRevokedFalseAndMarkForDeleteFalse(jwtToken);
 
       if (Objects.nonNull(token)) {
         token.setExpired(true);

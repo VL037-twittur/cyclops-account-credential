@@ -47,7 +47,7 @@ import vincentlow.twittur.account.credential.web.model.response.exception.Forbid
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-  private final String STARTS_WITH_BEARER = "Bearer "; // including space
+  private final String TOKEN_PREFIX = "Bearer ";
 
   @Autowired
   private AccountCredentialRepository accountCredentialRepository;
@@ -66,9 +66,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
   @Autowired
   private InformationFeignClient informationFeignClient;
-
-  // @Autowired
-  // private AccountProfileFeignClientService accountProfileFeignClientService;
 
   @Autowired
   private AccountProfileFeignClient accountProfileFeignClient;
@@ -164,8 +161,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-    if (Objects.nonNull(authHeader) && authHeader.startsWith(STARTS_WITH_BEARER)) {
-      String refreshToken = authHeader.substring(STARTS_WITH_BEARER.length());
+    if (Objects.nonNull(authHeader) && authHeader.startsWith(TOKEN_PREFIX)) {
+      String refreshToken = authHeader.substring(TOKEN_PREFIX.length());
       String username = jwtService.extractUsername(refreshToken);
 
       if (Objects.nonNull(username)) {
@@ -185,6 +182,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       }
     }
     throw new ForbiddenException(ExceptionMessage.AUTHENTICATION_FAILED);
+  }
+
+  @Override
+  public boolean validateToken(HttpServletRequest request, String token) {
+
+    return jwtService.isTokenValid(request, token);
   }
 
   private void validateRequest(CreateAccountRequest request) {
