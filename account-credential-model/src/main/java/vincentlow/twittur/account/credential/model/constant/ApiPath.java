@@ -7,4 +7,6 @@ public interface ApiPath {
   String AUTHENTICATION = BASE_PATH + "/auth";
 
   String ACCOUNT_CREDENTIAL = BASE_PATH + "/acc-cred";
+
+  String CACHE = BASE_PATH + "/cyclops-account-credential/cache";
 }
