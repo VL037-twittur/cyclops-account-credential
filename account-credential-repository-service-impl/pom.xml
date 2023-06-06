@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>account-credential-config</artifactId>
+    <artifactId>account-credential-repository-service-impl</artifactId>
     <packaging>jar</packaging>
 
     <properties>
@@ -21,13 +21,19 @@
     <dependencies>
         <dependency>
             <groupId>vincentlow.twittur</groupId>
-            <artifactId>account-credential-repository-service-impl</artifactId>
+            <artifactId>account-credential-repository-service</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>vincentlow.twittur</groupId>
             <artifactId>account-credential-service-impl</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>vincentlow.twittur</groupId>
+            <artifactId>account-credential-repository</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>

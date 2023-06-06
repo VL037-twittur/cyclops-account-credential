@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.BeanUtils;
@@ -34,7 +33,8 @@ import vincentlow.twittur.account.credential.model.constant.TokenType;
 import vincentlow.twittur.account.credential.model.entity.AccountCredential;
 import vincentlow.twittur.account.credential.model.entity.Token;
 import vincentlow.twittur.account.credential.repository.AccountCredentialRepository;
-import vincentlow.twittur.account.credential.repository.TokenRepository;
+import vincentlow.twittur.account.credential.repository.service.AccountCredentialRepositoryService;
+import vincentlow.twittur.account.credential.repository.service.TokenRepositoryService;
 import vincentlow.twittur.account.credential.util.StringUtil;
 import vincentlow.twittur.account.credential.util.ValidatorUtil;
 import vincentlow.twittur.account.credential.web.model.request.CreateAccountRequest;
@@ -47,13 +47,16 @@ import vincentlow.twittur.account.credential.web.model.response.exception.Forbid
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-  private final String TOKEN_PREFIX = "Bearer ";
+  private static final String TOKEN_PREFIX = "Bearer ";
+
+  @Autowired
+  private AccountCredentialRepositoryService accountCredentialRepositoryService;
 
   @Autowired
   private AccountCredentialRepository accountCredentialRepository;
 
   @Autowired
-  private TokenRepository tokenRepository;
+  private TokenRepositoryService tokenRepositoryService;
 
   @Autowired
   private PasswordEncoder passwordEncoder;
@@ -78,12 +81,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     validateRequest(request);
 
     AccountCredential existingAccount =
-        accountCredentialRepository.findByUsernameAndMarkForDeleteFalse(request.getUsername());
+        accountCredentialRepositoryService.findByUsernameAndMarkForDeleteFalse(request.getUsername());
     if (Objects.nonNull(existingAccount)) {
       throw new ConflictException(ExceptionMessage.USERNAME_IS_TAKEN);
     }
 
-    existingAccount = accountCredentialRepository.findByEmailAddressAndMarkForDeleteFalse(request.getEmailAddress());
+    existingAccount =
+        accountCredentialRepositoryService.findByEmailAddressAndMarkForDeleteFalse(request.getEmailAddress());
     if (Objects.nonNull(existingAccount)) {
       throw new ConflictException(ExceptionMessage.EMAIL_IS_ASSOCIATED_WITH_AN_ACCOUNT);
     }
@@ -101,7 +105,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     accountCredential.setUpdatedBy("system");
     accountCredential.setUpdatedDate(now);
 
-    accountCredentialRepository.save(accountCredential);
+    accountCredentialRepositoryService.save(accountCredential);
 
     CreateAccountProfileRequest createAccountProfileRequest = CreateAccountProfileRequest
         .builder()
@@ -167,7 +171,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
       if (Objects.nonNull(username)) {
         AccountCredential account =
-            accountCredentialRepository.findByIdAndMarkForDeleteFalse(username);
+            accountCredentialRepositoryService.findByIdAndMarkForDeleteFalse(username);
 
         if (jwtService.isTokenValid(refreshToken, account)) {
           String accessToken = jwtService.generateAccessToken(account);
@@ -261,18 +265,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     token.setUpdatedBy("system");
     token.setUpdatedDate(now);
 
-    tokenRepository.save(token);
+    tokenRepositoryService.save(token);
   }
 
   private void revokeAllAccountToken(AccountCredential accountCredential) { // Don't want multiple valid tokens
 
-    List<Token> validAccountTokens = tokenRepository.findAllValidTokensByAccountId(accountCredential.getId());
-    if (!validAccountTokens.isEmpty()) {
-      validAccountTokens.forEach(token -> {
-        token.setExpired(true);
-        token.setRevoked(true);
-      });
-      tokenRepository.saveAll(validAccountTokens);
-    }
+    tokenRepositoryService.deleteByAccountCredential(accountCredential);
   }
 }

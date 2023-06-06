@@ -11,13 +11,16 @@ import org.springframework.stereotype.Service;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import vincentlow.twittur.account.credential.model.entity.Token;
-import vincentlow.twittur.account.credential.repository.TokenRepository;
+import vincentlow.twittur.account.credential.repository.service.TokenRepositoryService;
 
 @Service
 public class LogoutServiceImpl implements LogoutHandler {
 
   @Autowired
-  private TokenRepository tokenRepository;
+  private TokenRepositoryService tokenRepositoryService;
+
+  @Autowired
+  private CacheService cacheService;
 
   @Override
   public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
@@ -25,12 +28,10 @@ public class LogoutServiceImpl implements LogoutHandler {
     String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
     if (Objects.nonNull(authHeader) && authHeader.startsWith(JWTServiceImpl.TOKEN_PREFIX)) {
       String jwtToken = authHeader.substring(JWTServiceImpl.TOKEN_PREFIX.length());
-      Token token = tokenRepository.findByTokenAndExpiredFalseAndRevokedFalseAndMarkForDeleteFalse(jwtToken);
+      Token token = tokenRepositoryService.findByToken(jwtToken);
 
       if (Objects.nonNull(token)) {
-        token.setExpired(true);
-        token.setRevoked(true);
-        tokenRepository.save(token);
+        tokenRepositoryService.deleteByAccountCredential(token.getAccountCredential());
       }
     }
   }

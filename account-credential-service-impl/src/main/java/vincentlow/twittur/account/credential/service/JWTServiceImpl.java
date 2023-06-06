@@ -20,10 +20,11 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import vincentlow.twittur.account.credential.model.entity.AccountCredential;
 import vincentlow.twittur.account.credential.model.entity.Token;
-import vincentlow.twittur.account.credential.repository.TokenRepository;
+import vincentlow.twittur.account.credential.repository.service.TokenRepositoryService;
 
 @Service
 public class JWTServiceImpl implements JWTService {
@@ -40,7 +41,7 @@ public class JWTServiceImpl implements JWTService {
   private long refreshTokenExpirationInMs;
 
   @Autowired
-  private TokenRepository tokenRepository;
+  private TokenRepositoryService tokenRepositoryService;
 
   @Autowired
   private UserDetailsService userDetailsService;
@@ -83,21 +84,20 @@ public class JWTServiceImpl implements JWTService {
       token = token.substring(TOKEN_PREFIX.length());
     }
 
-    String username = this.extractUsername(token);
+    try {
+      String username = this.extractUsername(token);
 
-    if (Objects.nonNull(username)) {
-      AccountCredential accountCredential = (AccountCredential) userDetailsService.loadUserByUsername(username);
-      Token accountToken = tokenRepository.findByTokenAndExpiredFalseAndRevokedFalseAndMarkForDeleteFalse(token);
+      if (Objects.nonNull(username)) {
+        AccountCredential accountCredential = (AccountCredential) userDetailsService.loadUserByUsername(username);
+        Token accountToken = tokenRepositoryService
+            .findByTokenAndExpiredFalseAndRevokedFalseAndMarkForDeleteFalse(accountCredential, token);
 
-      if (Objects.nonNull(accountToken) && isUserToken(username, accountCredential)) {
-        UsernamePasswordAuthenticationToken authToken =
-            new UsernamePasswordAuthenticationToken(accountCredential, null, accountCredential.getAuthorities());
-
-        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext()
-            .setAuthentication(authToken);
-        return true;
+        if (Objects.nonNull(accountToken) && isUserToken(username, accountCredential)) {
+          return setAuthentication(request, accountCredential);
+        }
       }
+    } catch (SignatureException ex) {
+      return false;
     }
     return false;
   }
@@ -143,5 +143,15 @@ public class JWTServiceImpl implements JWTService {
 
     return accountCredential.getId()
         .equals(username);
+  }
+
+  private boolean setAuthentication(HttpServletRequest request, AccountCredential accountCredential) {
+
+    UsernamePasswordAuthenticationToken authToken =
+        new UsernamePasswordAuthenticationToken(accountCredential, null, accountCredential.getAuthorities());
+    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+    SecurityContextHolder.getContext()
+        .setAuthentication(authToken);
+    return true;
   }
 }

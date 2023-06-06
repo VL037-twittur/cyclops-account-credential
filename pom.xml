@@ -30,6 +30,8 @@
         <module>account-credential-config</module>
         <module>account-credential-app</module>
         <module>account-credential-util</module>
+        <module>account-credential-repository-service</module>
+        <module>account-credential-repository-service-impl</module>
     </modules>
 
     <properties>
@@ -68,6 +70,10 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
         <dependency>

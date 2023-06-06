@@ -17,6 +17,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>vincentlow.twittur</groupId>
@@ -27,6 +28,12 @@
         <dependency>
             <groupId>vincentlow.twittur</groupId>
             <artifactId>account-credential-repository</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>vincentlow.twittur</groupId>
+            <artifactId>account-credential-repository-service</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
