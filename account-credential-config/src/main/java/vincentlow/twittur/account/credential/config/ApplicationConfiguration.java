@@ -14,22 +14,22 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import vincentlow.twittur.account.credential.model.entity.AccountCredential;
-import vincentlow.twittur.account.credential.repository.AccountCredentialRepository;
+import vincentlow.twittur.account.credential.repository.service.AccountCredentialRepositoryService;
 
 @Configuration
 public class ApplicationConfiguration {
 
   @Autowired
-  private AccountCredentialRepository accountCredentialRepository;
+  private AccountCredentialRepositoryService accountCredentialRepositoryService;
 
   @Bean
   public UserDetailsService userDetailsService() {
 
     return username -> {
       AccountCredential account =
-          accountCredentialRepository.findByUsernameOrEmailAddressAndMarkForDeleteFalse(username);
+          accountCredentialRepositoryService.findByUsernameOrEmailAddressAndMarkForDeleteFalse(username);
       if (Objects.isNull(account)) {
-        return accountCredentialRepository.findByIdAndMarkForDeleteFalse(username);
+        return accountCredentialRepositoryService.findByIdAndMarkForDeleteFalse(username);
       }
       return account;
     };

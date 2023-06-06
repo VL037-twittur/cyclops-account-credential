@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import jakarta.transaction.Transactional;
+import vincentlow.twittur.account.credential.model.entity.AccountCredential;
 import vincentlow.twittur.account.credential.model.entity.Token;
 
 @Repository
@@ -15,4 +17,9 @@ public interface TokenRepository extends JpaRepository<Token, String> {
   List<Token> findAllValidTokensByAccountId(String accountCredentialId);
 
   Token findByTokenAndExpiredFalseAndRevokedFalseAndMarkForDeleteFalse(String token);
+
+  Token findByToken(String token);
+
+  @Transactional
+  void deleteByAccountCredential(AccountCredential accountCredentialId);
 }

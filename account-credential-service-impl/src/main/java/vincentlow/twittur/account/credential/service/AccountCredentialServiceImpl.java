@@ -15,7 +15,7 @@ import io.micrometer.common.util.StringUtils;
 import vincentlow.twittur.account.credential.model.constant.ErrorCode;
 import vincentlow.twittur.account.credential.model.constant.ExceptionMessage;
 import vincentlow.twittur.account.credential.model.entity.AccountCredential;
-import vincentlow.twittur.account.credential.repository.AccountCredentialRepository;
+import vincentlow.twittur.account.credential.repository.service.AccountCredentialRepositoryService;
 import vincentlow.twittur.account.credential.service.helper.ValidatorHelper;
 import vincentlow.twittur.account.credential.util.StringUtil;
 import vincentlow.twittur.account.credential.web.model.request.UpdateAccountEmailRequest;
@@ -29,7 +29,7 @@ import vincentlow.twittur.account.credential.web.model.response.exception.Confli
 public class AccountCredentialServiceImpl implements AccountCredentialService {
 
   @Autowired
-  private AccountCredentialRepository accountCredentialRepository;
+  private AccountCredentialRepositoryService accountCredentialRepositoryService;
 
   @Autowired
   private PasswordEncoder passwordEncoder;
@@ -37,14 +37,15 @@ public class AccountCredentialServiceImpl implements AccountCredentialService {
   @Override
   public AccountCredential getAccountCredentialByUsername(String username) {
 
-    AccountCredential accountCredential = accountCredentialRepository.findByUsernameAndMarkForDeleteFalse(username);
+    AccountCredential accountCredential =
+        accountCredentialRepositoryService.findByUsernameAndMarkForDeleteFalse(username);
     return validateAccount(accountCredential, ExceptionMessage.ACCOUNT_NOT_FOUND);
   }
 
   @Override
   public AccountCredential getAccountCredentialById(String id) {
 
-    AccountCredential accountCredential = accountCredentialRepository.findByIdAndMarkForDeleteFalse(id);
+    AccountCredential accountCredential = accountCredentialRepositoryService.findByIdAndMarkForDeleteFalse(id);
     return validateAccount(accountCredential, ExceptionMessage.ACCOUNT_NOT_FOUND);
   }
 
@@ -52,7 +53,7 @@ public class AccountCredentialServiceImpl implements AccountCredentialService {
   public AccountCredential getAccountCredentialByEmailAddress(String emailAddress) {
 
     AccountCredential accountCredential =
-        accountCredentialRepository.findByEmailAddressAndMarkForDeleteFalse(emailAddress);
+        accountCredentialRepositoryService.findByEmailAddressAndMarkForDeleteFalse(emailAddress);
     return validateAccount(accountCredential, ExceptionMessage.ACCOUNT_NOT_FOUND);
   }
 
@@ -60,7 +61,7 @@ public class AccountCredentialServiceImpl implements AccountCredentialService {
   // @Transactional
   public void updateAccountUsernameById(String id, UpdateAccountUsernameRequest request) {
 
-    AccountCredential accountCredential = accountCredentialRepository.findByIdAndMarkForDeleteFalse(id);
+    AccountCredential accountCredential = accountCredentialRepositoryService.findByIdAndMarkForDeleteFalse(id);
     validateAccount(accountCredential, ExceptionMessage.ACCOUNT_NOT_FOUND);
 
     StringUtil.trimStrings(request);
@@ -78,7 +79,7 @@ public class AccountCredentialServiceImpl implements AccountCredentialService {
     }
 
     AccountCredential existingAccount =
-        accountCredentialRepository.findByUsernameAndMarkForDeleteFalse(request.getUsername());
+        accountCredentialRepositoryService.findByUsernameAndMarkForDeleteFalse(request.getUsername());
     if (Objects.nonNull(existingAccount)) {
       throw new ConflictException(ExceptionMessage.USERNAME_IS_TAKEN);
     }
@@ -88,13 +89,13 @@ public class AccountCredentialServiceImpl implements AccountCredentialService {
     accountCredential.setUpdatedBy(accountCredential.getId());
     accountCredential.setUpdatedDate(now);
 
-    accountCredentialRepository.save(accountCredential);
+    accountCredentialRepositoryService.save(accountCredential);
   }
 
   @Override
   public void updateAccountEmailAddressById(String id, UpdateAccountEmailRequest request) {
 
-    AccountCredential account = accountCredentialRepository.findByIdAndMarkForDeleteFalse(id);
+    AccountCredential account = accountCredentialRepositoryService.findByIdAndMarkForDeleteFalse(id);
     validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
 
     StringUtil.trimStrings(request);
@@ -111,7 +112,7 @@ public class AccountCredentialServiceImpl implements AccountCredentialService {
     }
 
     AccountCredential existingAccount =
-        accountCredentialRepository.findByEmailAddressAndMarkForDeleteFalse(request.getEmailAddress());
+        accountCredentialRepositoryService.findByEmailAddressAndMarkForDeleteFalse(request.getEmailAddress());
     if (Objects.nonNull(existingAccount)) {
       throw new ConflictException(ExceptionMessage.EMAIL_IS_ASSOCIATED_WITH_AN_ACCOUNT);
     }
@@ -120,13 +121,13 @@ public class AccountCredentialServiceImpl implements AccountCredentialService {
     account.setUpdatedBy(account.getId());
     account.setUpdatedDate(LocalDateTime.now());
 
-    accountCredentialRepository.save(account);
+    accountCredentialRepositoryService.save(account);
   }
 
   @Override
   public void updateAccountPhoneNumberById(String id, UpdateAccountPhoneNumberRequest request) {
 
-    AccountCredential account = accountCredentialRepository.findByIdAndMarkForDeleteFalse(id);
+    AccountCredential account = accountCredentialRepositoryService.findByIdAndMarkForDeleteFalse(id);
     validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
 
     StringUtil.trimStrings(request);
@@ -143,13 +144,13 @@ public class AccountCredentialServiceImpl implements AccountCredentialService {
     account.setUpdatedBy(account.getId());
     account.setUpdatedDate(LocalDateTime.now());
 
-    accountCredentialRepository.save(account);
+    accountCredentialRepositoryService.save(account);
   }
 
   @Override
   public void updateAccountPasswordById(String id, UpdateAccountPasswordRequest request) {
 
-    AccountCredential account = accountCredentialRepository.findByIdAndMarkForDeleteFalse(id);
+    AccountCredential account = accountCredentialRepositoryService.findByIdAndMarkForDeleteFalse(id);
     validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
 
     StringUtil.trimStrings(request);
@@ -172,6 +173,6 @@ public class AccountCredentialServiceImpl implements AccountCredentialService {
     account.setUpdatedBy(account.getId());
     account.setUpdatedDate(LocalDateTime.now());
 
-    accountCredentialRepository.save(account);
+    accountCredentialRepositoryService.save(account);
   }
 }
